@@ -22,7 +22,7 @@ long t = 1000; //time between debounce interruptions
 int totalPoupado = 0;
 int moeda = 0;
 EasyNex myNex(Serial); // Create an object of EasyNex class with the name < myNex >
-
+//some modd here
 List<char> entradaSenha;
 List<char> senha;
 String nomeUsuario;
