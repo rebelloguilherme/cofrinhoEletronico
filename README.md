@@ -1,13 +1,14 @@
 ##Cofrinho Eletrônico Educativo##
 
 Este projeto tem fins educativos e faz parte do trabalho de conclusão de curso Ciências da Computação.
-Durante este trabalho será construido um cofrinho eletrônico educativo, o qual o usuário poderá guardar suas moedas.
+Durante este trabalho será construído um cofrinho eletrônico educativo, o qual o usuário poderá guardar suas moedas.
 
 #Features do cofrinho:#
+
  - Reconhecimento das moedas e soma;
  - Definição de 3 objetos que deseja comprar (nome e valor);
  - Acompanhamento dos objetivos definidos;
- - Possibilitadade de escolha entre abrir o cofre quando alcançar um dos objetivos.
+ - Possibilidade de escolha entre abrir o cofre quando alcançar um dos objetivos.
 
 #Implementações previstas na próxima versão:#
  - Abertura com a senha;
