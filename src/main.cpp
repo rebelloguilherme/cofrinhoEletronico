@@ -3,6 +3,7 @@
 #include <FS.h>
 #include <Servo.h>
 #include <ListLib.h>
+#include <Effortless_SPIFFS.h>
 
 const int REFRESH_TIME = 300;           // time to refresh the Nextion data every 1000 ms
 unsigned long refresh_timer = millis(); // timer for refreshing Nextion's page
@@ -19,7 +20,7 @@ const int moeda10 = 13;
 
 //Variaveis utilizadas no algoritmo
 long t = 1000; //time between debounce interruptions
-int totalPoupado = 0;
+int totalPoupado = 0; //variável que representa o total poupado
 int moeda = 0;
 EasyNex myNex(Serial); // Create an object of EasyNex class with the name < myNex >
 //some modd here
@@ -38,6 +39,8 @@ int valobj2Display = 0;
 int valobj3Display = 0;
 int valobj4Display = 0;
 int valobj5Display = 0;
+
+
 
 void Insert100()
 {
@@ -144,7 +147,7 @@ void IRAM_ATTR debounceInterrupt5()
 }
 
 void setup()
-{
+{  
   myNex.begin(9600);
   pinMode(moeda100, INPUT);
   pinMode(moeda50, INPUT);
@@ -171,6 +174,14 @@ void loop()
 {
   //if ((millis() - refresh_timer) > REFRESH_TIME)
   // {
+  eSPIFFS fileSystem;  
+  
+  //Fazer uma tela aqui que caso o sistema identifique que já tem dados na memória
+  //pergunta se o usuário deseja restaurar ou quer iniciar do zero
+  
+  //Leitura dos valores salvos em memória
+  fileSystem.openFromFile("/totalPoupado.txt", totalPoupado); //reading Data from File
+
   myNex.NextionListen();
   switch (myNex.currentPageId)
   {
@@ -227,6 +238,7 @@ void loop()
       // }
       // temp = valobj1Display * 100;
       totalPoupado = totalPoupado - saque * 100;
+      fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
       saque = 0;
 
       progress1 = totalPoupado / valobj1Display;
@@ -263,8 +275,9 @@ void loop()
       myNex.writeNum("dashboard.progress3.val", progress3);
 
       if (moeda != 0) // atualiza a cada moeda inserida
-      {               //alguma moeda foi inserida
+      {               //alguma moeda foi inserida                
         totalPoupado = totalPoupado + moeda;
+        fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
 
         moeda = 0;
         if (servoMoeda.read() == 0)
@@ -298,7 +311,7 @@ void loop()
   case 7: //chooseValor
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
-      myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);
+      myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);      
       myNex.writeNum("chooseValor.saque.val",0);
       delay(100);
       do
@@ -517,6 +530,7 @@ void trigger13() //23 02 54 0D ação do botão sacar total na pagina chooseSaqu
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
   totalPoupado = 0;
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
   valobj1Display = 0;
   obj1 = "";
   obj2 = "";
