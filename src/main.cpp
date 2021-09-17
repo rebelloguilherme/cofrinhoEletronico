@@ -5,7 +5,7 @@
 #include <ListLib.h>
 #include <Effortless_SPIFFS.h>
 
-const int REFRESH_TIME = 300;           // time to refresh the Nextion data every 1000 ms
+const int REFRESH_TIME = 300;           // time to refresh the Nextion data every x ms
 unsigned long refresh_timer = millis(); // timer for refreshing Nextion's page
 long debouncing_time = 1500;            //Debouncing Time in Milliseconds 1000 //Software debouncing in Interrupt, by Delphiño K.M.
 volatile unsigned long last_micros;
@@ -19,28 +19,25 @@ const int moeda5 = 12;
 const int moeda10 = 13;
 
 //Variaveis utilizadas no algoritmo
-long t = 1000; //time between debounce interruptions
+long t = 1000;        //time between debounce interruptions
 int totalPoupado = 0; //variável que representa o total poupado
 int moeda = 0;
 EasyNex myNex(Serial); // Create an object of EasyNex class with the name < myNex >
 //some modd here
 List<char> entradaSenha;
 List<char> senha;
-String nomeUsuario;
-String obj1, obj2, obj3, obj4, obj5;
-uint16_t progress1 = 0;
-uint16_t progress2 = 0;
-uint16_t progress3 = 0;
-uint16_t progress4 = 0;
-uint16_t progress5 = 0;
-int saque = 0;
+String nomeUsuario = "";
+String obj1 = "";
+String obj2 = "";
+String obj3 = "";
 int valobj1Display = 0;
 int valobj2Display = 0;
 int valobj3Display = 0;
-int valobj4Display = 0;
-int valobj5Display = 0;
-
-
+uint16_t progress1 = 0;
+uint16_t progress2 = 0;
+uint16_t progress3 = 0;
+int saque = 0;
+eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 
 void Insert100()
 {
@@ -80,7 +77,6 @@ void Insert5()
   servoMoeda.write(0);
   digitalWrite(LED_BUILTIN, LOW);
 }
-
 
 void comparaSenha()
 {
@@ -147,7 +143,7 @@ void IRAM_ATTR debounceInterrupt5()
 }
 
 void setup()
-{  
+{
   myNex.begin(9600);
   pinMode(moeda100, INPUT);
   pinMode(moeda50, INPUT);
@@ -170,17 +166,33 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(moeda10), debounceInterrupt5, RISING);
 }
 
+
 void loop()
 {
   //if ((millis() - refresh_timer) > REFRESH_TIME)
   // {
-  eSPIFFS fileSystem;  
-  
+
   //Fazer uma tela aqui que caso o sistema identifique que já tem dados na memória
   //pergunta se o usuário deseja restaurar ou quer iniciar do zero
   
-  //Leitura dos valores salvos em memória
+  //Leitura dos valores salvos em memória  
   fileSystem.openFromFile("/totalPoupado.txt", totalPoupado); //reading Data from File
+  delay(50);
+  fileSystem.openFromFile("/nomeUsuario.txt", nomeUsuario);
+  delay(50);
+  fileSystem.openFromFile("/obj1.txt", obj1);
+  delay(50);
+  fileSystem.openFromFile("/obj2.txt", obj2);
+  delay(50);
+  fileSystem.openFromFile("/obj3.txt", obj3);
+  delay(50);
+  fileSystem.openFromFile("/valobj1Display.txt", valobj1Display);
+  delay(50);
+  fileSystem.openFromFile("/valobj2Display.txt", valobj2Display);
+  delay(50);
+  fileSystem.openFromFile("/valobj3Display.txt", valobj3Display);
+  delay(50);
+  
 
   myNex.NextionListen();
   switch (myNex.currentPageId)
@@ -200,7 +212,11 @@ void loop()
   case 2: //userData
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
-      nomeUsuario = myNex.readStr("nameUser.txt");
+      if (nomeUsuario.length > 0)
+      {
+        nomeUsuario = myNex.readStr("nameUser.txt");
+        fileSystem.saveToFile("/nomeUsuario.txt", nomeUsuario); //saving data into file
+      }
       delay(100);
       refresh_timer = millis();
     }
@@ -208,13 +224,24 @@ void loop()
   case 3: //goals
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
-      obj1 = myNex.readStr("goals.objetivo1.txt");
-      valobj1Display = myNex.readNumber("goals.objVal1.val");
-      obj2 = myNex.readStr("goals.objetivo2.txt");
-      valobj2Display = myNex.readNumber("goals.objVal2.val");
-      obj3 = myNex.readStr("goals.objetivo3.txt");
-      valobj3Display = myNex.readNumber("goals.objVal3.val");
-      refresh_timer = millis();
+      if (obj1 == "" || obj2 == "" || obj3 == "")
+      {
+        obj1 = myNex.readStr("goals.objetivo1.txt");
+        fileSystem.saveToFile("/obj1.txt", obj1); //saving data into file
+        valobj1Display = myNex.readNumber("goals.objVal1.val");
+        fileSystem.saveToFile("/valobj1Display.txt", valobj1Display);
+
+        obj2 = myNex.readStr("goals.objetivo2.txt");
+        fileSystem.saveToFile("/obj2.txt", obj2); //saving data into file
+        valobj2Display = myNex.readNumber("goals.objVal2.val");
+        fileSystem.saveToFile("/valobj2Display.txt", valobj2Display);
+
+        obj3 = myNex.readStr("goals.objetivo3.txt");
+        fileSystem.saveToFile("/obj3.txt", obj3); //saving data into file
+        valobj3Display = myNex.readNumber("goals.objVal3.val");
+        fileSystem.saveToFile("/valobj3Display.txt", valobj3Display);
+        refresh_timer = millis();
+      }
     }
     break;
   case 4:                                            //dashboard
@@ -258,24 +285,24 @@ void loop()
       }
       delay(350);
       myNex.writeNum("dashboard.totalPoupado.val", totalPoupado);
-      
+
       myNex.writeStr("dashboard.objetivo1disp.txt", obj1);
       myNex.writeNum("dashboard.objetivo1val.val", valobj1Display * 100);
-      
+
       myNex.writeStr("dashboard.objetivo2disp.txt", obj2);
       myNex.writeNum("dashboard.objetivo2val.val", valobj2Display * 100);
-      
+
       myNex.writeStr("dashboard.objetivo3disp.txt", obj3);
       myNex.writeNum("dashboard.objetivo3val.val", valobj3Display * 100);
-      
+
       myNex.writeNum("dashboard.progress1.val", progress1);
-      
+
       myNex.writeNum("dashboard.progress2.val", progress2);
-      
+
       myNex.writeNum("dashboard.progress3.val", progress3);
 
       if (moeda != 0) // atualiza a cada moeda inserida
-      {               //alguma moeda foi inserida                
+      {               //alguma moeda foi inserida
         totalPoupado = totalPoupado + moeda;
         fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
 
@@ -311,8 +338,8 @@ void loop()
   case 7: //chooseValor
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
-      myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);      
-      myNex.writeNum("chooseValor.saque.val",0);
+      myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);
+      myNex.writeNum("chooseValor.saque.val", 0);
       delay(100);
       do
       {
