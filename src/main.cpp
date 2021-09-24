@@ -27,9 +27,9 @@ EasyNex myNex(Serial); // Create an object of EasyNex class with the name < myNe
 List<char> entradaSenha;
 List<char> senha;
 String nomeUsuario = "";
-String obj1 = "";
-String obj2 = "";
-String obj3 = "";
+String obj1;
+String obj2;
+String obj3;
 int valobj1Display = 0;
 int valobj2Display = 0;
 int valobj3Display = 0;
@@ -38,6 +38,7 @@ uint16_t progress2 = 0;
 uint16_t progress3 = 0;
 int saque = 0;
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
+bool carregarDados = true;
 
 void Insert(int moeda)
 {
@@ -135,44 +136,62 @@ void setup()
   attachInterrupt(digitalPinToInterrupt(MOEDA10), debounceInterrupt5, RISING);
 }
 
-
 void loop()
-{  
-  myNex.NextionListen();
-  
-  fileSystem.openFromFile("/totalPoupado.txt", totalPoupado); //reading Data from File
-  delay(50);
-  fileSystem.openFromFile("/nomeUsuario.txt", nomeUsuario);
-  delay(50);
-  fileSystem.openFromFile("/obj1.txt", obj1);
-  delay(50);
-  fileSystem.openFromFile("/obj2.txt", obj2);
-  delay(50);
-  fileSystem.openFromFile("/obj3.txt", obj3);
-  delay(50);
-  fileSystem.openFromFile("/valobj1Display.txt", valobj1Display);
-  delay(50);
-  fileSystem.openFromFile("/valobj2Display.txt", valobj2Display);
-  delay(50);
-  fileSystem.openFromFile("/valobj3Display.txt", valobj3Display);
-  delay(50);
-  
+{
+  myNex.NextionListen(); //Tentar deixar somente esta função no void loop
+
+  if (carregarDados)
+  {
+    fileSystem.openFromFile("/totalPoupado.txt", totalPoupado); //reading Data from File
+    delay(50);
+    fileSystem.openFromFile("/nomeUsuario.txt", nomeUsuario);
+    delay(50);
+    fileSystem.openFromFile("/obj1.txt", obj1);
+    delay(50);
+    fileSystem.openFromFile("/obj2.txt", obj2);
+    delay(50);
+    fileSystem.openFromFile("/obj3.txt", obj3);
+    delay(50);
+    fileSystem.openFromFile("/valobj1Display.txt", valobj1Display);
+    delay(50);
+    fileSystem.openFromFile("/valobj2Display.txt", valobj2Display);
+    delay(50);
+    fileSystem.openFromFile("/valobj3Display.txt", valobj3Display);
+    delay(50);
+    carregarDados = false;
+  }
 
   switch (myNex.currentPageId)
   {
-  case 0:
+
+  case 0: //intro
+    if ((millis() - refresh_timer) > REFRESH_TIME)
+    {
+      // if (obj1.length() > 0 || obj2.length() > 0 || obj3.length() > 0)
+      // {
+      //   myNex.writeStr("page dashboard");
+      // }
+      // else
+      // {
+      //   myNex.writeStr("page introConfig");
+      // }
+      myNex.writeStr("page introConfig");
+      refresh_timer = millis();
+    }
+    break;
+  case 1: //introConfig
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       refresh_timer = millis();
     }
     break;
-  case 1: //ChangePass
+  case 2: //ChangePass
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       refresh_timer = millis();
     }
     break;
-  case 2: //userData
+  case 3: //userData
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       if (nomeUsuario.length() > 0)
@@ -180,11 +199,10 @@ void loop()
         nomeUsuario = myNex.readStr("nameUser.txt");
         fileSystem.saveToFile("/nomeUsuario.txt", nomeUsuario); //saving data into file
       }
-      delay(100);
       refresh_timer = millis();
     }
     break;
-  case 3: //goals
+  case 4: //goals
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       if (obj1 == "" || obj2 == "" || obj3 == "")
@@ -207,7 +225,7 @@ void loop()
       }
     }
     break;
-  case 4:                                            //dashboard
+  case 5:                                            //dashboard
     if (((millis() - refresh_timer) > REFRESH_TIME)) //condição da pagina carregada pela 1ª vez
     {
       // if (valobj1Display != 777777)
@@ -230,6 +248,7 @@ void loop()
       totalPoupado = totalPoupado - saque * 100;
       fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
       saque = 0;
+      
 
       progress1 = totalPoupado / valobj1Display;
       if (progress1 >= 100)
@@ -284,7 +303,7 @@ void loop()
       refresh_timer = millis();
     }
     break;
-  case 5: //congrats
+  case 6: //congrats
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       delay(100);
@@ -292,13 +311,13 @@ void loop()
       refresh_timer = millis();
     }
     break;
-  case 6: //chooseSaque
+  case 7: //chooseSaque
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       refresh_timer = millis();
     }
     break;
-  case 7: //chooseValor
+  case 8: //chooseValor
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);
@@ -314,37 +333,36 @@ void loop()
       refresh_timer = millis();
     }
     break;
-  case 8: //wrongPass
-    if ((millis() - refresh_timer) > REFRESH_TIME)
-    {
-      refresh_timer = millis();
-    }
-    break;
   case 9: //passEnter
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       refresh_timer = millis();
     }
     break;
-  case 10: //Unlk
+  case 10: //unlocked
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       refresh_timer = millis();
     }
     break;
-  case 11: //Lockd
+  case 11: //locked
     if ((millis() - refresh_timer) > REFRESH_TIME)
     {
       refresh_timer = millis();
     }
     break;
-  default:
+  case 12: //Lockd
+    if ((millis() - refresh_timer) > REFRESH_TIME)
+    {
+      refresh_timer = millis();
+    }
     break;
   }
 }
 
-void trigger0()
+void trigger0() //introConfig configButton
 {
+  myNex.writeStr("page userData");
 }
 
 void trigger1()
@@ -497,7 +515,7 @@ void trigger10()
   }
 }
 
-void trigger11()
+void trigger11()//unlocked lockButton
 { //Evento ativado no botão Lock, page1
   digitalWrite(LED_BUILTIN, LOW);
   delay(100);
@@ -506,8 +524,8 @@ void trigger11()
   myNex.writeStr("page intro");
 }
 
-void trigger12()
-{ //Evento ativado no botão Try it, page2
+void trigger12()//locked tryAgainButton
+{ 
   digitalWrite(LED_BUILTIN, LOW);
   delay(100);
   digitalWrite(LED_BUILTIN, HIGH);
@@ -515,7 +533,7 @@ void trigger12()
   myNex.writeStr("page passEnter");
 }
 
-void trigger13() //23 02 54 0D ação do botão sacar total na pagina chooseSaque
+void trigger13() //chooseSaque sacarTotal(button)
 {
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
@@ -534,10 +552,85 @@ void trigger13() //23 02 54 0D ação do botão sacar total na pagina chooseSaqu
   digitalWrite(LED_BUILTIN, HIGH);
 }
 
-void trigger14() // 23 02 54 0E ação do botão sacar valor na pagina chooseSaque
+void trigger14() //chooseSaque sacarValor(button)
 {
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
   myNex.writeStr("page chooseValor");
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger15() //changePass okButton
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger16() //changePass cancelButton
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger17() //userData nextButton
+{
+  myNex.writeStr("page goals");
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger18() //goals okButton
+{
+  myNex.writeStr("page dashboard");
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger19() //goals cancelButton
+{
+  myNex.writeStr("page animationTest"); //only for test purpouses
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger20() //Dashboard backButton
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  myNex.writeStr("page goals");
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger21() //Dashboard unlockButton
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  myNex.writeStr("page passEnter");
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger22() //congrats openButton
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger23() //congrats waitButton
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void trigger24() //chooseValor cancelButton
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
 }
