@@ -45,12 +45,146 @@ int saque = 0;
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 bool carregarDados = true;
 
+void refreshPage4() //Dashboard
+{
+  if (totalPoupado != lastTotalPoupado || newPageLoaded == true)
+  {
+    myNex.writeNum("dashboard.totalPoupado.val", totalPoupado);
+
+    myNex.writeStr("dashboard.objetivo1disp.txt", obj1);
+    myNex.writeNum("dashboard.objetivo1val.val", valobj1Display * 100);
+
+    myNex.writeStr("dashboard.objetivo2disp.txt", obj2);
+    myNex.writeNum("dashboard.objetivo2val.val", valobj2Display * 100);
+
+    myNex.writeStr("dashboard.objetivo3disp.txt", obj3);
+    myNex.writeNum("dashboard.objetivo3val.val", valobj3Display * 100);
+
+    myNex.writeNum("dashboard.progress1.val", progress1);
+
+    myNex.writeNum("dashboard.progress2.val", progress2);
+
+    myNex.writeNum("dashboard.progress3.val", progress3);
+
+    lastTotalPoupado = totalPoupado;
+  }
+}
+
+void refreshPage5() //congrats
+{
+  //mostrar o nome do usuário..
+  myNex.writeStr("congrats.user.txt", nomeUsuario);
+}
+void refreshPage7() //chooseSaque
+{
+  //mostrar total poupado
+  myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);
+  //implementar o quanto a pessoa quer sacar...
+}
+void refreshPage8() //passEnter
+{
+}
+
+void firstRefresh()
+{ // This function's purpose is to update the values of a new page when is first loaded,
+  // and refreshing all the components with the current values as Nextion shows the Attribute val.
+  if (myNex.currentPageId != myNex.lastCurrentPageId)
+  {                       // If the two variables are different, means a new page is loaded.
+    newPageLoaded = true; // A new page is loaded
+                          // This variable is used as an argument at the if() statement on the refreshPageXX() voids,
+                          // in order when is true to update all the values on the page with their current values
+                          // with out run a comparison with the last value.
+
+    switch (myNex.currentPageId)
+    {
+    case 4: //dashboard
+      refreshPage4();
+      break;
+
+    case 5: //congrats
+      refreshPage5();
+      break;
+
+    case 7: //chooseSaque
+      refreshPage7();
+      break;
+
+    case 8: //chooseValor
+      refreshPage8();
+      break;
+    }
+
+    newPageLoaded = false; // After we have updated the new page for the first time, we update the variable to false.
+                           // Now the values updated ONLY if the new value is different from the last Sent value.
+                           // See void refreshPage0()
+
+    myNex.lastCurrentPageId = myNex.currentPageId; // After the refresh of the new page We make them equal,
+                                                   // in order to identify the next page change.
+  }
+}
+
+void refreshCurrentPage()
+{
+  // In this function we refresh the page currently loaded every DATA_REFRESH_RATE
+  if ((millis() - pageRefreshTimer) > DATA_REFRESH_RATE)
+  {
+    switch (myNex.currentPageId)
+    {
+    case 4: //dashboard
+      refreshPage4();
+      break;
+
+    case 5: //congrats
+      refreshPage5();
+      break;
+
+    case 7: //chooseSaque
+      refreshPage7();
+      break;
+
+    case 8: //chooseValor
+      refreshPage8();
+      break;
+    }
+  }
+}
+
+
 void Insert(int moeda)
 {
+  //atualiza tudo que decorre da inserção da moeda...
   //Serial.println("Moeda de 1 real detectada");//Used if Nextion display is disabled
   Moeda = moeda;
   servoMoeda.write(0);
   digitalWrite(LED_BUILTIN, LOW);
+  totalPoupado = totalPoupado + Moeda;
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  Moeda = 0;
+  if (servoMoeda.read() == 0)
+  {
+    delay(600);
+    servoMoeda.write(150);
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
+  progress1 = totalPoupado / valobj1Display;
+  if (progress1 >= 100)
+  {
+    progress1 = 100;
+  }
+  progress2 = totalPoupado / valobj2Display;
+  if (progress2 >= 100)
+  {
+    progress2 = 100;
+  }
+  progress3 = totalPoupado / valobj3Display;
+  if (progress3 >= 100)
+  {
+    progress3 = 100;
+  }
+  if (progress1 == 100 && progress2 == 100 && progress3 == 100)
+  {
+    myNex.writeStr("page congrats");
+  }
 }
 
 void comparaSenha()
@@ -147,112 +281,11 @@ void loop()
 {
   myNex.NextionListen(); //Tentar deixar somente esta função no void loop
 
-  listeningMoeda();
-
   refreshCurrentPage();
 
   firstRefresh();
 }
 
-void listeningMoeda()
-{
-  if (Moeda != 0)
-  {
-    //alguma moeda foi inserida
-    totalPoupado = totalPoupado + Moeda;
-    fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
-    Moeda = 0;
-
-    if (servoMoeda.read() == 0)
-    {
-      delay(600);
-      servoMoeda.write(150);
-      digitalWrite(LED_BUILTIN, HIGH);
-    }
-
-    progress1 = totalPoupado / valobj1Display;
-    if (progress1 >= 100)
-    {
-      progress1 = 100;
-    }
-    progress2 = totalPoupado / valobj2Display;
-    if (progress2 >= 100)
-    {
-      progress2 = 100;
-    }
-    progress3 = totalPoupado / valobj3Display;
-    if (progress3 >= 100)
-    {
-      progress3 = 100;
-    }
-  }
-}
-void firstRefresh()
-{ // This function's purpose is to update the values of a new page when is first loaded,
-  // and refreshing all the components with the current values as Nextion shows the Attribute val.
-
-  if (myNex.currentPageId != myNex.lastCurrentPageId)
-  { // If the two variables are different, means a new page is loaded.
-
-    newPageLoaded = true; // A new page is loaded
-                          // This variable is used as an argument at the if() statement on the refreshPageXX() voids,
-                          // in order when is true to update all the values on the page with their current values
-                          // with out run a comparison with the last value.
-
-    switch (myNex.currentPageId)
-    {
-    case 5:
-      refreshPage5();
-      break;
-
-    case 6:
-      refreshPage6();
-      break;
-
-    case 8:
-      refreshPage8();
-      break;
-
-    case 9:
-      refreshPage9();
-      break;
-    }
-
-    newPageLoaded = false; // After we have updated the new page for the first time, we update the variable to false.
-                           // Now the values updated ONLY if the new value is different from the last Sent value.
-                           // See void refreshPage0()
-
-    myNex.lastCurrentPageId = myNex.currentPageId; // After the refresh of the new page We make them equal,
-                                                   // in order to identify the next page change.
-  }
-}
-
-void refreshCurrentPage()
-{
-  // In this function we refresh the page currently loaded every DATA_REFRESH_RATE
-  if ((millis() - pageRefreshTimer) > DATA_REFRESH_RATE)
-  {
-    switch (myNex.currentPageId)
-    {
-    case 5:
-      refreshPage5();
-      break;
-
-    case 6:
-      refreshPage6();
-      break;
-
-    case 8:
-      refreshPage8();
-      break;
-
-    case 9:
-      refreshPage9();
-      break;
-    }
-    pageRefreshTimer = millis();
-  }
-}
 
 // void refreshPage0()
 // {
@@ -260,7 +293,6 @@ void refreshCurrentPage()
 //   // and avoid sending unnecessary data over Serial.
 //   // Also with the newPageLoaded boolean variable, we bypass the if() argument of temperature != lastSentTemperature (last value comparison)
 //   // so as to update all the values on Nextion when a new page is loaded, independant of if the values have changed
-
 //   if (temperature != lastSentTemperature || newPageLoaded == true)
 //   {
 
@@ -277,35 +309,7 @@ void refreshCurrentPage()
 //   }
 // }
 
-void refreshPage5()
-{
-  // Use lastSentTemperature, in order to update the components ONLY when their value has changed
-  // and avoid sending unnecessary data over Serial.
-  // Also with the newPageLoaded boolean variable, we bypass the if() argument of temperature != lastSentTemperature (last value comparison)
-  // so as to update all the values on Nextion when a new page is loaded, independant of if the values have changed
 
-  if (totalPoupado != lastTotalPoupado || newPageLoaded == true)
-  {
-    myNex.writeNum("dashboard.totalPoupado.val", totalPoupado);
-
-    myNex.writeStr("dashboard.objetivo1disp.txt", obj1);
-    myNex.writeNum("dashboard.objetivo1val.val", valobj1Display * 100);
-
-    myNex.writeStr("dashboard.objetivo2disp.txt", obj2);
-    myNex.writeNum("dashboard.objetivo2val.val", valobj2Display * 100);
-
-    myNex.writeStr("dashboard.objetivo3disp.txt", obj3);
-    myNex.writeNum("dashboard.objetivo3val.val", valobj3Display * 100);
-
-    myNex.writeNum("dashboard.progress1.val", progress1);
-
-    myNex.writeNum("dashboard.progress2.val", progress2);
-
-    myNex.writeNum("dashboard.progress3.val", progress3);
-
-    lastTotalPoupado = totalPoupado;
-  }
-}
 
 void trigger0() //introConfig configButton
 {
@@ -493,18 +497,16 @@ void trigger13() //chooseSaque sacarTotal(button)
   valobj1Display = 0;
   valobj2Display = 0;
   valobj3Display = 0;
-  // myNex.writeStr("goals.objetivo1.txt",obj1);
-  // myNex.writeNum("goals.objVal1.val",mostraValObj1);
-  myNex.writeStr("page goals");
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page goals");
 }
 
 void trigger14() //chooseSaque sacarValor(button)
 {
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
-  myNex.writeStr("page chooseValor");
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page chooseValor");
 }
 
 void trigger15() //changePass okButton
@@ -523,42 +525,58 @@ void trigger16() //changePass cancelButton
 
 void trigger17() //userData nextButton
 {
-  myNex.writeStr("page goals");
+  nomeUsuario = myNex.readStr("userData.nameUser.txt");
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page goals");
 }
 
 void trigger18() //goals okButton
 {
-  myNex.writeStr("page dashboard");
+  obj1 = myNex.readStr("goals.objetivo1.txt");
+  fileSystem.saveToFile("/obj1.txt", obj1); //saving data into file
+  valobj1Display = myNex.readNumber("goals.objVal1.val");
+  fileSystem.saveToFile("/valobj1Display.txt", valobj1Display);
+
+  obj2 = myNex.readStr("goals.objetivo2.txt");
+  fileSystem.saveToFile("/obj2.txt", obj2); //saving data into file
+  valobj2Display = myNex.readNumber("goals.objVal2.val");
+  fileSystem.saveToFile("/valobj2Display.txt", valobj2Display);
+
+  obj3 = myNex.readStr("goals.objetivo3.txt");
+  fileSystem.saveToFile("/obj3.txt", obj3); //saving data into file
+  valobj3Display = myNex.readNumber("goals.objVal3.val");
+  fileSystem.saveToFile("/valobj3Display.txt", valobj3Display);
+
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page dashboard");
 }
 
 void trigger19() //goals cancelButton
 {
-  myNex.writeStr("page animationTest"); //only for test purpouses
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page animationTest"); //only for test purpouses
 }
 
 void trigger20() //Dashboard backButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  myNex.writeStr("page goals");
   delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page goals");
 }
 
 void trigger21() //Dashboard unlockButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  myNex.writeStr("page passEnter");
   delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page passEnter");
 }
 
 void trigger22() //congrats openButton
@@ -566,6 +584,7 @@ void trigger22() //congrats openButton
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page chooseSaque");
 }
 
 void trigger23() //congrats waitButton
@@ -580,4 +599,18 @@ void trigger24() //chooseValor cancelButton
   digitalWrite(LED_BUILTIN, LOW);
   delay(500);
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page chooseSaque");
+}
+
+void trigger25() //chooseValor okButton
+{
+  while (saque < 0)
+  {
+    saque = myNex.readNumber("chooseValor.saque.val");
+  }
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  digitalWrite(LED_BUILTIN, HIGH);
+  totalPoupado = totalPoupado - saque;
+  myNex.writeStr("page dashboard");
 }
