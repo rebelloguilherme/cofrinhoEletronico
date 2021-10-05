@@ -48,21 +48,6 @@ int saque = 0;
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 bool carregarDados = true;
 
-void refreshPage5() //congrats
-{
-  //mostrar o nome do usuário..
-  myNex.writeStr("congrats.user.txt", nomeUsuario);
-}
-void refreshPage7() //chooseSaque
-{
-  //mostrar total poupado
-  myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);
-  //implementar o quanto a pessoa quer sacar...
-}
-void refreshPage8() //passEnter
-{
-}
-
 void atualizaDashboard()
 {
   myNex.writeNum("dashboard.totalPoupado.val", totalPoupado);
@@ -149,6 +134,21 @@ void comparaSenha()
   }
 }
 
+void Digitou(char tecla)
+{ //DIGITOU tecla
+  if (entradaSenha.Count() < senha.Count())
+  {
+    entradaSenha.Add(tecla);
+    digitalWrite(LED_BUILTIN, LOW);
+    delay(250);
+    digitalWrite(LED_BUILTIN, HIGH);
+  }
+  else if (entradaSenha.Count() == senha.Count())
+  {
+    comparaSenha();
+  }
+}
+
 void IRAM_ATTR debounceInterrupt100()
 { //antes estava void ICACHE_RAM_ATTR
   if ((long)(micros() - last_micros) >= debouncing_time * t)
@@ -212,7 +212,6 @@ void setup()
   delay(50);
   myNex.lastCurrentPageId = 1; // At the first run of the loop, the currentPageId and the lastCurrentPageId
                                // must have different values, due to run the function firstRefresh()
-
   attachInterrupt(digitalPinToInterrupt(MOEDA100), debounceInterrupt100, RISING);
   attachInterrupt(digitalPinToInterrupt(MOEDA50), debounceInterrupt50, RISING);
   attachInterrupt(digitalPinToInterrupt(MOEDA25), debounceInterrupt25, RISING);
@@ -238,155 +237,45 @@ void trigger0() //introConfig configButton
 {
   myNex.writeStr("page userData");
 }
-
 void trigger1()
 { //DIGITOU 1
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('1');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('1');
 }
-
 void trigger2()
 { //DIGITOU 2
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('2');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('2');
 }
-
 void trigger3()
 { //DIGITOU 3
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('3');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('3');
 }
-
 void trigger4()
 { //DIGITOU 4
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('4');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('4');
 }
-
 void trigger5()
 { //DIGITOU 5
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('5');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('5');
 }
-
 void trigger6()
 { //DIGITOU 6
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('6');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('6');
 }
-
 void trigger7()
 { //DIGITOU 7
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('7');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('7');
 }
-
 void trigger8()
 { //DIGITOU 8
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('8');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('8');
 }
-
 void trigger9()
 { //DIGITOU 9
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('9');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('9');
 }
-
 void trigger10()
 { //DIGITOU 0
-  if (entradaSenha.Count() < senha.Count())
-  {
-    entradaSenha.Add('0');
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
-  }
-  else if (entradaSenha.Count() == senha.Count())
-  {
-    comparaSenha();
-  }
+  Digitou('0');
 }
 
 void trigger11() //unlocked lockButton
@@ -536,8 +425,7 @@ void trigger24() //chooseValor cancelButton
 }
 
 void trigger25() //chooseValor okButton
-{
-  
+{ 
   saque = myNex.readNumber("chooseValor.saque.val");
   
   digitalWrite(LED_BUILTIN, LOW);
