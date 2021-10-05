@@ -34,6 +34,10 @@ EasyNex myNex(Serial); // Create an object of EasyNex class with the name < myNe
 //some modd here
 List<char> entradaSenha;
 List<char> senha;
+senha.Add('0');
+senha.Add('0');
+senha.Add('0');
+senha.Add('0');
 String nomeUsuario = "";
 String obj1;
 String obj2;
@@ -47,6 +51,9 @@ uint16_t progress3 = 0;
 int saque = 0;
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 bool carregarDados = true;
+
+
+
 
 void atualizaDashboard()
 {
@@ -330,14 +337,14 @@ void trigger14() //chooseSaque sacarValor(button)
 void trigger15() //changePass okButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  delay(500);
+  delay(200);
   digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void trigger16() //changePass cancelButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  delay(500);
+  delay(200);
   digitalWrite(LED_BUILTIN, HIGH);
 }
 
@@ -345,7 +352,7 @@ void trigger17() //userData nextButton
 {
   nomeUsuario = myNex.readStr("userData.nameUser.txt");
   digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
+  delay(100);
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page goals");
 }
@@ -380,7 +387,7 @@ void trigger18() //goals okButton
 void trigger19() //goals cancelButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
+  delay(100);
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page animationTest"); //only for test purpouses
 }
@@ -388,7 +395,7 @@ void trigger19() //goals cancelButton
 void trigger20() //Dashboard backButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
+  delay(100);
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page goals");
 }
@@ -396,7 +403,7 @@ void trigger20() //Dashboard backButton
 void trigger21() //Dashboard unlockButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
+  delay(100);
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page passEnter");
 }
@@ -404,7 +411,7 @@ void trigger21() //Dashboard unlockButton
 void trigger22() //congrats openButton
 {
   digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
+  delay(100);
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page chooseSaque");
 }
