@@ -2,7 +2,6 @@
 #include <EasyNextionLibrary.h>
 #include <FS.h>
 #include <Servo.h>
-#include <ListLib.h>
 #include <Effortless_SPIFFS.h>
 
 #define DATA_REFRESH_RATE 1000             // The time between each Data refresh of the page, defaut is 1000
@@ -32,12 +31,8 @@ int Moeda = 0;
 bool moedaInserida = false;
 EasyNex myNex(Serial); // Create an object of EasyNex class with the name < myNex >
 //some modd here
-List<char> entradaSenha;
-List<char> senha;
-senha.Add('0');
-senha.Add('0');
-senha.Add('0');
-senha.Add('0');
+String entradaSenha;
+String senha = "0000";
 String nomeUsuario = "";
 String obj1;
 String obj2;
@@ -52,8 +47,12 @@ int saque = 0;
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 bool carregarDados = true;
 
-
-
+void PiscaStatus()
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(100);
+  digitalWrite(LED_BUILTIN, HIGH);
+}
 
 void atualizaDashboard()
 {
@@ -97,7 +96,6 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
   //fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
   Moeda = 0;
   digitalWrite(LED_BUILTIN, HIGH);
-  
 
   progress1 = totalPoupado / valobj1Display;
   if (progress1 >= 100)
@@ -124,33 +122,50 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
 
 void comparaSenha()
 {
-  String entradaSenhaArray, senhaArray;
-  entradaSenhaArray = entradaSenha.ToArray();
-  senhaArray = senha.ToArray();
-  if (entradaSenhaArray.equals(senhaArray))
+  myNex.writeNum("passEnter.q1.picc", 61); //Apaga o 1º led virtual
+  myNex.writeNum("passEnter.q2.picc", 61); //Apaga o 2º led virtual
+  myNex.writeNum("passEnter.q3.picc", 61); //Apaga o 3º led virtual
+  myNex.writeNum("passEnter.q0.picc", 61); //Apaga o 4º led virtual
+  if (entradaSenha.equals(senha))
   {
     delay(200);
-    myNex.writeStr("page Unlk");
+    myNex.writeStr("page unlocked");
   }
   else
   {
-    entradaSenha.Clear();
-    entradaSenhaArray.clear();
+    entradaSenha.remove(0, 4);
     delay(200);
-    myNex.writeStr("page Lockd");
+    myNex.writeStr("page locked");
   }
 }
 
-void Digitou(char tecla)
+void Digitou(String tecla)
 { //DIGITOU tecla
-  if (entradaSenha.Count() < senha.Count())
+  if (entradaSenha.length() < senha.length())
   {
-    entradaSenha.Add(tecla);
-    digitalWrite(LED_BUILTIN, LOW);
-    delay(250);
-    digitalWrite(LED_BUILTIN, HIGH);
+    entradaSenha += tecla;
+    if (entradaSenha.length() == 1)
+    {
+      myNex.writeNum("passEnter.q0.picc", 62); //ascende o 1º led virtual
+      PiscaStatus();
+    }
+    if (entradaSenha.length() == 2)
+    {
+      myNex.writeNum("passEnter.q1.picc", 62); //ascende o 1º led virtual
+      PiscaStatus();
+    }
+    if (entradaSenha.length() == 3)
+    {
+      myNex.writeNum("passEnter.q2.picc", 62); //ascende o 1º led virtual
+      PiscaStatus();
+    }
+    if (entradaSenha.length() == 4)
+    {
+      myNex.writeNum("passEnter.q3.picc", 62); //ascende o 1º led virtual
+      PiscaStatus();
+    }
   }
-  else if (entradaSenha.Count() == senha.Count())
+  else if (entradaSenha.length() == senha.length())
   {
     comparaSenha();
   }
@@ -211,6 +226,7 @@ void setup()
   pinMode(MOEDA10, INPUT);
   pinMode(LED_BUILTIN, OUTPUT); // The built-in LED(GPIO 2) is initialized as an output and will be used to debug some stuff
   digitalWrite(LED_BUILTIN, HIGH);
+
   servoMoeda.attach(15); // attaching PIN D8(GPIO15) to servo Signal pin
   delay(200);
   servoMoeda.write(140); //Rampa de moedas travada, valor original 150
@@ -246,60 +262,56 @@ void trigger0() //introConfig configButton
 }
 void trigger1()
 { //DIGITOU 1
-  Digitou('1');
+  Digitou("1");
 }
 void trigger2()
 { //DIGITOU 2
-  Digitou('2');
+  Digitou("2");
 }
 void trigger3()
 { //DIGITOU 3
-  Digitou('3');
+  Digitou("3");
 }
 void trigger4()
 { //DIGITOU 4
-  Digitou('4');
+  Digitou("4");
 }
 void trigger5()
 { //DIGITOU 5
-  Digitou('5');
+  Digitou("5");
 }
 void trigger6()
 { //DIGITOU 6
-  Digitou('6');
+  Digitou("6");
 }
 void trigger7()
 { //DIGITOU 7
-  Digitou('7');
+  Digitou("7");
 }
 void trigger8()
 { //DIGITOU 8
-  Digitou('8');
+  Digitou("8");
 }
 void trigger9()
 { //DIGITOU 9
-  Digitou('9');
+  Digitou("9");
 }
 void trigger10()
 { //DIGITOU 0
-  Digitou('0');
+  Digitou("0");
 }
 
 void trigger11() //unlocked lockButton
 {                //Evento ativado no botão Lock, page1
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
-  entradaSenha.Clear();
+  PiscaStatus();
+  entradaSenha.remove(0, 4);
   myNex.writeStr("page intro");
 }
 
 void trigger12() //locked tryAgainButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
-  entradaSenha.Clear();
+  PiscaStatus();
+  entradaSenha.remove(0, 4);
   myNex.writeStr("page passEnter");
 }
 
@@ -327,33 +339,25 @@ void trigger13() //chooseSaque sacarTotal(button)
 
 void trigger14() //chooseSaque sacarValor(button)
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(500);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   myNex.writeStr("page chooseValor");
   myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);
 }
 
 void trigger15() //changePass okButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
 }
 
 void trigger16() //changePass cancelButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
 }
 
 void trigger17() //userData nextButton
 {
   nomeUsuario = myNex.readStr("userData.nameUser.txt");
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   myNex.writeStr("page goals");
 }
 
@@ -376,9 +380,7 @@ void trigger18() //goals okButton
   delay(50);
   fileSystem.saveToFile("/obj3.txt", obj3); //saving data into file
   delay(50);
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   atualizaDashboard();
   myNex.writeStr("page dashboard");
   //chama função que atualiza dashboard
@@ -386,59 +388,45 @@ void trigger18() //goals okButton
 
 void trigger19() //goals cancelButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   myNex.writeStr("page animationTest"); //only for test purpouses
 }
 
 void trigger20() //Dashboard backButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   myNex.writeStr("page goals");
 }
 
 void trigger21() //Dashboard unlockButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   myNex.writeStr("page passEnter");
 }
 
 void trigger22() //congrats openButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(100);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   myNex.writeStr("page chooseSaque");
 }
 
 void trigger23() //congrats waitButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
 }
 
 void trigger24() //chooseValor cancelButton
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
-  digitalWrite(LED_BUILTIN, HIGH);
+  PiscaStatus();
   myNex.writeStr("page chooseSaque");
 }
 
 void trigger25() //chooseValor okButton
-{ 
+{
   saque = myNex.readNumber("chooseValor.saque.val");
-  
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(200);
-  digitalWrite(LED_BUILTIN, HIGH);
-  totalPoupado = totalPoupado - (saque*100);
+
+  PiscaStatus();
+  totalPoupado = totalPoupado - (saque * 100);
   myNex.writeStr("page dashboard");
   atualizaDashboard();
 }
