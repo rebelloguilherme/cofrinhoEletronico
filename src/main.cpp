@@ -40,9 +40,11 @@ String obj3;
 int valobj1Display = 0;
 int valobj2Display = 0;
 int valobj3Display = 0;
+int valTotalDisplay = 0;
 uint16_t progress1 = 0;
 uint16_t progress2 = 0;
 uint16_t progress3 = 0;
+uint16_t progressTotal = 0;
 int saque = 0;
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 bool carregarDados = true;
@@ -67,24 +69,42 @@ void atualizaDashboard()
   myNex.writeStr("dashboard.objetivo3disp.txt", obj3);
   myNex.writeNum("dashboard.objetivo3val.val", valobj3Display * 100);
 
+  myNex.writeNum("dashboard.objetivoTotal.val", valTotalDisplay * 100);
+
   progress1 = totalPoupado / valobj1Display;
   if (progress1 >= 100)
   {
     progress1 = 100;
+    myNex.writeNum("dashboard.resgatar1.pic", 25);
+    myNex.writeNum("dashboard.resgatar1.pic2", 26);
   }
   progress2 = totalPoupado / valobj2Display;
   if (progress2 >= 100)
   {
     progress2 = 100;
+    myNex.writeNum("dashboard.resgatar2.pic", 25);
+    myNex.writeNum("dashboard.resgatar2.pic2", 26);
   }
   progress3 = totalPoupado / valobj3Display;
   if (progress3 >= 100)
   {
     progress3 = 100;
+    myNex.writeNum("dashboard.resgatar3.pic", 25);
+    myNex.writeNum("dashboard.resgatar3.pic2", 26);
   }
+  progressTotal = totalPoupado / valTotalDisplay;
+  if (progressTotal >= 100)
+  {
+    progressTotal = 100;
+    myNex.writeNum("dashboard.resgatarTotal.pic", 25);
+    myNex.writeNum("dashboard.resgatarTotal.pic2", 26);
+  }
+
+
   myNex.writeNum("dashboard.progress1.val", progress1);
   myNex.writeNum("dashboard.progress2.val", progress2);
   myNex.writeNum("dashboard.progress3.val", progress3);
+  myNex.writeNum("dashboard.progressTotal.val", progressTotal);
 }
 
 void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
@@ -101,20 +121,29 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
   if (progress1 >= 100)
   {
     progress1 = 100;
+    myNex.writeNum("dashboard.resgatar1.pic", 25);
+    myNex.writeNum("dashboard.resgatar1.pic2", 26);
   }
   progress2 = totalPoupado / valobj2Display;
   if (progress2 >= 100)
   {
     progress2 = 100;
+    myNex.writeNum("dashboard.resgatar2.pic", 25);
+    myNex.writeNum("dashboard.resgatar2.pic2", 26);
   }
   progress3 = totalPoupado / valobj3Display;
   if (progress3 >= 100)
   {
     progress3 = 100;
+    myNex.writeNum("dashboard.resgatar3.pic", 25);
+    myNex.writeNum("dashboard.resgatar3.pic2", 26);
   }
-  if (progress1 == 100 && progress2 == 100 && progress3 == 100)
+  progressTotal = totalPoupado / valTotalDisplay;
+  if (progressTotal >= 100)
   {
-    myNex.writeStr("page congrats");
+    progressTotal = 100;
+    myNex.writeNum("dashboard.resgatarTotal.pic", 25);
+    myNex.writeNum("dashboard.resgatarTotal.pic2", 26);
   }
   atualizaDashboard();
   moedaInserida = true;
@@ -321,7 +350,6 @@ void trigger13() //chooseSaque sacarTotal(button)
   delay(500);
   totalPoupado = 0;
   fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
-  valobj1Display = 0;
   obj1 = "";
   obj2 = "";
   obj3 = "";
@@ -429,4 +457,36 @@ void trigger25() //chooseValor okButton
   totalPoupado = totalPoupado - (saque * 100);
   myNex.writeStr("page dashboard");
   atualizaDashboard();
+}
+
+void trigger26() //dashboard resgatar1 Button
+{
+}
+void trigger27() //dashboard resgatar2 Button
+{  
+}
+void trigger28() //dashboard resgatar3 Button
+{  
+}
+void trigger29() //dashboard resgatarTotal Button
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(500);
+  totalPoupado = 0;
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  obj1 = "";
+  obj2 = "";
+  obj3 = "";
+  valobj1Display = 0;
+  valobj2Display = 0;
+  valobj3Display = 0;
+  valTotalDisplay = 0;
+  //atualizar aqui as barras de progresso...
+  progress1 = 0;
+  progress2 = 0;
+  progress3 = 0;
+  progressTotal =0;
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page goals");  
 }
