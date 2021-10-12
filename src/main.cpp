@@ -57,7 +57,8 @@ void PiscaStatus()
 }
 
 void atualizaDashboard()
-{
+{  
+  
   myNex.writeNum("dashboard.totalPoupado.val", totalPoupado);
 
   myNex.writeStr("dashboard.objetivo1disp.txt", obj1);
@@ -69,6 +70,7 @@ void atualizaDashboard()
   myNex.writeStr("dashboard.objetivo3disp.txt", obj3);
   myNex.writeNum("dashboard.objetivo3val.val", valobj3Display * 100);
 
+  valTotalDisplay = valobj1Display + valobj2Display + valobj3Display;
   myNex.writeNum("dashboard.objetivoTotal.val", valTotalDisplay * 100);
 
   progress1 = totalPoupado / valobj1Display;
@@ -100,7 +102,7 @@ void atualizaDashboard()
     myNex.writeNum("dashboard.resgatarTotal.pic2", 26);
   }
 
-
+  //escrever na tela o valor total
   myNex.writeNum("dashboard.progress1.val", progress1);
   myNex.writeNum("dashboard.progress2.val", progress2);
   myNex.writeNum("dashboard.progress3.val", progress3);
@@ -346,30 +348,10 @@ void trigger12() //locked tryAgainButton
 
 void trigger13() //chooseSaque sacarTotal(button)
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(500);
-  totalPoupado = 0;
-  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
-  obj1 = "";
-  obj2 = "";
-  obj3 = "";
-  valobj1Display = 0;
-  valobj2Display = 0;
-  valobj3Display = 0;
-  //atualizar aqui as barras de progresso...
-  progress1 = 0;
-  progress2 = 0;
-  progress3 = 0;
-
-  digitalWrite(LED_BUILTIN, HIGH);
-  myNex.writeStr("page goals");
 }
 
 void trigger14() //chooseSaque sacarValor(button)
 {
-  PiscaStatus();
-  myNex.writeStr("page chooseValor");
-  myNex.writeNum("chooseValor.totalPoupado.val", totalPoupado);
 }
 
 void trigger15() //changePass okButton
@@ -399,6 +381,7 @@ void trigger18() //goals okButton
   fileSystem.saveToFile("/valobj2Display.txt", valobj2Display);
   obj3 = myNex.readStr("goals.objetivo3.txt");
   valobj3Display = myNex.readNumber("goals.objVal3.val");
+  valTotalDisplay = valobj1Display + valobj2Display + valobj3Display;
   fileSystem.saveToFile("/valobj3Display.txt", valobj3Display);
 
   delay(50);
@@ -434,19 +417,14 @@ void trigger21() //Dashboard unlockButton
 
 void trigger22() //congrats openButton
 {
-  PiscaStatus();
-  myNex.writeStr("page chooseSaque");
 }
 
 void trigger23() //congrats waitButton
 {
-  PiscaStatus();
 }
 
 void trigger24() //chooseValor cancelButton
 {
-  PiscaStatus();
-  myNex.writeStr("page chooseSaque");
 }
 
 void trigger25() //chooseValor okButton
@@ -461,12 +439,39 @@ void trigger25() //chooseValor okButton
 
 void trigger26() //dashboard resgatar1 Button
 {
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(150);
+  totalPoupado = totalPoupado - (valobj1Display * 100);
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page congrats");  
+  delay(1000);  
+  myNex.writeStr("page dashboard");
+  atualizaDashboard();
 }
 void trigger27() //dashboard resgatar2 Button
-{  
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(150);
+  totalPoupado = totalPoupado - (valobj2Display * 100);
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page congrats");  
+  delay(1000);
+  myNex.writeStr("page dashboard");
+  atualizaDashboard();  
 }
 void trigger28() //dashboard resgatar3 Button
-{  
+{
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(150);
+  totalPoupado = totalPoupado - (valobj3Display * 100);
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("page congrats");  
+  delay(1000);
+  myNex.writeStr("page dashboard");
+  atualizaDashboard();  
 }
 void trigger29() //dashboard resgatarTotal Button
 {
@@ -486,7 +491,6 @@ void trigger29() //dashboard resgatarTotal Button
   progress2 = 0;
   progress3 = 0;
   progressTotal =0;
-
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page goals");  
 }
