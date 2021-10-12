@@ -74,32 +74,52 @@ void atualizaDashboard()
   myNex.writeNum("dashboard.objetivoTotal.val", valTotalDisplay * 100);
 
   progress1 = totalPoupado / valobj1Display;
+  if(progress1 < 100)
+  {
+    myNex.writeNum("dashboard.resgatar1.pic", 53);
+    myNex.writeNum("dashboard.resgatar1.pic2", 53);
+  }
   if (progress1 >= 100)
   {
     progress1 = 100;
-    myNex.writeNum("dashboard.resgatar1.pic", 25);
-    myNex.writeNum("dashboard.resgatar1.pic2", 26);
+    myNex.writeNum("dashboard.resgatar1.pic", 15);
+    myNex.writeNum("dashboard.resgatar1.pic2", 16);
   }
   progress2 = totalPoupado / valobj2Display;
+  if(progress2 < 100)
+  {
+    myNex.writeNum("dashboard.resgatar2.pic", 53);
+    myNex.writeNum("dashboard.resgatar2.pic2", 53);
+  }
   if (progress2 >= 100)
   {
     progress2 = 100;
-    myNex.writeNum("dashboard.resgatar2.pic", 25);
-    myNex.writeNum("dashboard.resgatar2.pic2", 26);
+    myNex.writeNum("dashboard.resgatar2.pic", 15);
+    myNex.writeNum("dashboard.resgatar2.pic2", 16);
   }
   progress3 = totalPoupado / valobj3Display;
+  if(progress3 < 100)
+  {
+    myNex.writeNum("dashboard.resgatar3.pic", 53);
+    myNex.writeNum("dashboard.resgatar3.pic2", 53);
+  }
   if (progress3 >= 100)
   {
     progress3 = 100;
-    myNex.writeNum("dashboard.resgatar3.pic", 25);
-    myNex.writeNum("dashboard.resgatar3.pic2", 26);
+    myNex.writeNum("dashboard.resgatar3.pic", 15);
+    myNex.writeNum("dashboard.resgatar3.pic2", 16);
   }
   progressTotal = totalPoupado / valTotalDisplay;
+  if(progressTotal < 100)
+  {
+    myNex.writeNum("dashboard.resgatarTotal.pic", 53);
+    myNex.writeNum("dashboard.resgatarTotal.pic2", 53);
+  }
   if (progressTotal >= 100)
   {
     progressTotal = 100;
-    myNex.writeNum("dashboard.resgatarTotal.pic", 25);
-    myNex.writeNum("dashboard.resgatarTotal.pic2", 26);
+    myNex.writeNum("dashboard.resgatarTotal.pic", 15);
+    myNex.writeNum("dashboard.resgatarTotal.pic2", 16);
   }
 
   //escrever na tela o valor total
@@ -123,29 +143,29 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
   if (progress1 >= 100)
   {
     progress1 = 100;
-    myNex.writeNum("dashboard.resgatar1.pic", 25);
-    myNex.writeNum("dashboard.resgatar1.pic2", 26);
-  }
+    myNex.writeNum("dashboard.resgatar1.pic", 15);
+    myNex.writeNum("dashboard.resgatar1.pic2", 16);
+  }  
   progress2 = totalPoupado / valobj2Display;
   if (progress2 >= 100)
   {
     progress2 = 100;
-    myNex.writeNum("dashboard.resgatar2.pic", 25);
-    myNex.writeNum("dashboard.resgatar2.pic2", 26);
+    myNex.writeNum("dashboard.resgatar2.pic", 15);
+    myNex.writeNum("dashboard.resgatar2.pic2", 16);
   }
   progress3 = totalPoupado / valobj3Display;
   if (progress3 >= 100)
   {
     progress3 = 100;
-    myNex.writeNum("dashboard.resgatar3.pic", 25);
-    myNex.writeNum("dashboard.resgatar3.pic2", 26);
+    myNex.writeNum("dashboard.resgatar3.pic", 15);
+    myNex.writeNum("dashboard.resgatar3.pic2", 16);
   }
   progressTotal = totalPoupado / valTotalDisplay;
   if (progressTotal >= 100)
   {
     progressTotal = 100;
-    myNex.writeNum("dashboard.resgatarTotal.pic", 25);
-    myNex.writeNum("dashboard.resgatarTotal.pic2", 26);
+    myNex.writeNum("dashboard.resgatarTotal.pic", 15);
+    myNex.writeNum("dashboard.resgatarTotal.pic2", 16);
   }
   atualizaDashboard();
   moedaInserida = true;
@@ -153,10 +173,10 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
 
 void comparaSenha()
 {
-  myNex.writeNum("passEnter.q1.picc", 61); //Apaga o 1º led virtual
-  myNex.writeNum("passEnter.q2.picc", 61); //Apaga o 2º led virtual
-  myNex.writeNum("passEnter.q3.picc", 61); //Apaga o 3º led virtual
-  myNex.writeNum("passEnter.q0.picc", 61); //Apaga o 4º led virtual
+  myNex.writeNum("passEnter.q1.picc", 4); //Apaga o 1º led virtual
+  myNex.writeNum("passEnter.q2.picc", 4); //Apaga o 2º led virtual
+  myNex.writeNum("passEnter.q3.picc", 4); //Apaga o 3º led virtual
+  myNex.writeNum("passEnter.q0.picc", 4); //Apaga o 4º led virtual
   if (entradaSenha.equals(senha))
   {
     delay(200);
@@ -443,9 +463,10 @@ void trigger26() //dashboard resgatar1 Button
   delay(150);
   totalPoupado = totalPoupado - (valobj1Display * 100);
   fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
-  digitalWrite(LED_BUILTIN, HIGH);
-  myNex.writeStr("page congrats");  
-  delay(1000);  
+  digitalWrite(LED_BUILTIN, HIGH);  
+  myNex.writeStr("page congrats");
+  myNex.writeStr("congrats.user.txt", nomeUsuario);
+  delay(5000);  
   myNex.writeStr("page dashboard");
   atualizaDashboard();
 }
@@ -457,7 +478,8 @@ void trigger27() //dashboard resgatar2 Button
   fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page congrats");  
-  delay(1000);
+  myNex.writeStr("congrats.user.txt", nomeUsuario);  
+  delay(5000);
   myNex.writeStr("page dashboard");
   atualizaDashboard();  
 }
@@ -469,7 +491,8 @@ void trigger28() //dashboard resgatar3 Button
   fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page congrats");  
-  delay(1000);
+  myNex.writeStr("congrats.user.txt", nomeUsuario);  
+  delay(5000);
   myNex.writeStr("page dashboard");
   atualizaDashboard();  
 }
@@ -479,6 +502,14 @@ void trigger29() //dashboard resgatarTotal Button
   delay(500);
   totalPoupado = 0;
   fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  myNex.writeNum("dashboard.resgatar1.pic", 53);
+  myNex.writeNum("dashboard.resgatar1.pic2", 53);
+  myNex.writeNum("dashboard.resgatar2.pic", 53);
+  myNex.writeNum("dashboard.resgatar2.pic2", 53);
+  myNex.writeNum("dashboard.resgatar3.pic", 53);
+  myNex.writeNum("dashboard.resgatar3.pic2", 53);
+  myNex.writeNum("dashboard.resgatarTotal.pic", 53);
+  myNex.writeNum("dashboard.resgatarTotal.pic2", 53);
   obj1 = "";
   obj2 = "";
   obj3 = "";
@@ -492,5 +523,8 @@ void trigger29() //dashboard resgatarTotal Button
   progress3 = 0;
   progressTotal =0;
   digitalWrite(LED_BUILTIN, HIGH);
+  myNex.writeStr("congrats.user.txt", nomeUsuario);  
+  myNex.writeStr("page congrats");   
+  delay(5000);
   myNex.writeStr("page goals");  
 }
