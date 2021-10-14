@@ -131,12 +131,10 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
 {
   Moeda = moeda;
   servoMoeda.write(0); //Libera a moeda
-  digitalWrite(LED_BUILTIN, LOW);
   totalPoupado = totalPoupado + Moeda;
   //fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
   Moeda = 0;
-  digitalWrite(LED_BUILTIN, HIGH);
-
+  PiscaStatus();
   // progress1 = totalPoupado / valobj1Display;
   // if (progress1 >= 100)
   // {
@@ -200,17 +198,17 @@ void Digitou(String tecla)
     }
     if (entradaSenha.length() == 2)
     {
-      myNex.writeNum("passEnter.q1.picc", 62); //ascende o 1º led virtual
+      myNex.writeNum("passEnter.q1.picc", 62); //ascende o 2º led virtual
       PiscaStatus();
     }
     if (entradaSenha.length() == 3)
     {
-      myNex.writeNum("passEnter.q2.picc", 62); //ascende o 1º led virtual
+      myNex.writeNum("passEnter.q2.picc", 62); //ascende o 3º led virtual
       PiscaStatus();
     }
     if (entradaSenha.length() == 4)
     {
-      myNex.writeNum("passEnter.q3.picc", 62); //ascende o 1º led virtual
+      myNex.writeNum("passEnter.q3.picc", 62); //ascende o 4º led virtual
       PiscaStatus();
     }
   }
@@ -409,9 +407,9 @@ void trigger18() //goals okButton
   delay(50);
   fileSystem.saveToFile("/obj3.txt", obj3); //saving data into file
   delay(50);
-  PiscaStatus();
-  atualizaDashboard();
+  PiscaStatus();  
   myNex.writeStr("page dashboard");
+  atualizaDashboard();
   //chama função que atualiza dashboard
 }
 
@@ -495,19 +493,9 @@ void trigger28() //dashboard resgatar3 Button
   atualizaDashboard();  
 }
 void trigger29() //dashboard resgatarTotal Button
-{
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(500);
+{  
   totalPoupado = 0;
   fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
-  myNex.writeNum("dashboard.resgatar1.pic", 53);
-  myNex.writeNum("dashboard.resgatar1.pic2", 53);
-  myNex.writeNum("dashboard.resgatar2.pic", 53);
-  myNex.writeNum("dashboard.resgatar2.pic2", 53);
-  myNex.writeNum("dashboard.resgatar3.pic", 53);
-  myNex.writeNum("dashboard.resgatar3.pic2", 53);
-  myNex.writeNum("dashboard.resgatarTotal.pic", 53);
-  myNex.writeNum("dashboard.resgatarTotal.pic2", 53);
   obj1 = "";
   obj2 = "";
   obj3 = "";
@@ -515,12 +503,12 @@ void trigger29() //dashboard resgatarTotal Button
   valobj2Display = 0;
   valobj3Display = 0;
   valTotalDisplay = 0;
-  //atualizar aqui as barras de progresso...
   progress1 = 0;
   progress2 = 0;
   progress3 = 0;
   progressTotal =0;
-  digitalWrite(LED_BUILTIN, HIGH);
+  atualizaDashboard();
+  PiscaStatus();  
   myNex.writeStr("congrats.user.txt", nomeUsuario);  
   myNex.writeStr("page congrats");   
   delay(5000);
