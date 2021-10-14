@@ -57,8 +57,7 @@ void PiscaStatus()
 }
 
 void atualizaDashboard()
-{  
-  
+{    
   myNex.writeNum("dashboard.totalPoupado.val", totalPoupado);
 
   myNex.writeStr("dashboard.objetivo1disp.txt", obj1);
@@ -121,7 +120,6 @@ void atualizaDashboard()
     myNex.writeNum("dashboard.resgatarTotal.pic", 15);
     myNex.writeNum("dashboard.resgatarTotal.pic2", 16);
   }
-
   //escrever na tela o valor total
   myNex.writeNum("dashboard.progress1.val", progress1);
   myNex.writeNum("dashboard.progress2.val", progress2);
@@ -139,34 +137,34 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
   Moeda = 0;
   digitalWrite(LED_BUILTIN, HIGH);
 
-  progress1 = totalPoupado / valobj1Display;
-  if (progress1 >= 100)
-  {
-    progress1 = 100;
-    myNex.writeNum("dashboard.resgatar1.pic", 15);
-    myNex.writeNum("dashboard.resgatar1.pic2", 16);
-  }  
-  progress2 = totalPoupado / valobj2Display;
-  if (progress2 >= 100)
-  {
-    progress2 = 100;
-    myNex.writeNum("dashboard.resgatar2.pic", 15);
-    myNex.writeNum("dashboard.resgatar2.pic2", 16);
-  }
-  progress3 = totalPoupado / valobj3Display;
-  if (progress3 >= 100)
-  {
-    progress3 = 100;
-    myNex.writeNum("dashboard.resgatar3.pic", 15);
-    myNex.writeNum("dashboard.resgatar3.pic2", 16);
-  }
-  progressTotal = totalPoupado / valTotalDisplay;
-  if (progressTotal >= 100)
-  {
-    progressTotal = 100;
-    myNex.writeNum("dashboard.resgatarTotal.pic", 15);
-    myNex.writeNum("dashboard.resgatarTotal.pic2", 16);
-  }
+  // progress1 = totalPoupado / valobj1Display;
+  // if (progress1 >= 100)
+  // {
+  //   progress1 = 100;
+  //   myNex.writeNum("dashboard.resgatar1.pic", 15);
+  //   myNex.writeNum("dashboard.resgatar1.pic2", 16);
+  // }  
+  // progress2 = totalPoupado / valobj2Display;
+  // if (progress2 >= 100)
+  // {
+  //   progress2 = 100;
+  //   myNex.writeNum("dashboard.resgatar2.pic", 15);
+  //   myNex.writeNum("dashboard.resgatar2.pic2", 16);
+  // }
+  // progress3 = totalPoupado / valobj3Display;
+  // if (progress3 >= 100)
+  // {
+  //   progress3 = 100;
+  //   myNex.writeNum("dashboard.resgatar3.pic", 15);
+  //   myNex.writeNum("dashboard.resgatar3.pic2", 16);
+  // }
+  // progressTotal = totalPoupado / valTotalDisplay;
+  // if (progressTotal >= 100)
+  // {
+  //   progressTotal = 100;
+  //   myNex.writeNum("dashboard.resgatarTotal.pic", 15);
+  //   myNex.writeNum("dashboard.resgatarTotal.pic2", 16);
+  // }
   atualizaDashboard();
   moedaInserida = true;
 }
