@@ -3,13 +3,6 @@
 #include <FS.h>
 #include <Servo.h>
 #include <Effortless_SPIFFS.h>
-
-#define DATA_REFRESH_RATE 1000             // The time between each Data refresh of the page, defaut is 1000
-unsigned long pageRefreshTimer = millis(); // Timer for DATA_REFRESH_RATE
-bool newPageLoaded = false;                // true when the page is first loaded ( lastCurrentPageId != currentPageId )
-
-Servo servoMoeda;
-
 //Definições dos pinos do ESP 8266
 const int MOEDA100 = 5;
 const int MOEDA50 = 4;
@@ -17,7 +10,8 @@ const int MOEDA25 = 14;
 const int MOEDA5 = 12;
 const int MOEDA10 = 13;
 
-//Variaveis utilizadas no algoritmo
+eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
+Servo servoMoeda;
 long debouncing_time = 1500; //Debouncing Time in Milliseconds 1000 //Software debouncing in Interrupt, by Delphiño K.M.//1500 era o ultimo valor
 volatile unsigned long last_micros;
 long t = 1000; //time between debounce interruptions
@@ -25,8 +19,6 @@ long debouncing_Servo = 500;
 long tyneT = 500;
 
 int totalPoupado = 0; //variável que representa o total poupado
-int lastTotalPoupado = 0;
-
 int Moeda = 0;
 bool moedaInserida = false;
 EasyNex myNex(Serial); // Create an object of EasyNex class with the name < myNex >
@@ -46,8 +38,6 @@ uint16_t progress2 = 0;
 uint16_t progress3 = 0;
 uint16_t progressTotal = 0;
 int saque = 0;
-eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
-bool carregarDados = true;
 
 void SalvaValores()
 {
@@ -57,7 +47,6 @@ void SalvaValores()
   fileSystem.saveToFile("valobj1Display.txt", valobj1Display);
   fileSystem.saveToFile("valobj2Display.txt", valobj2Display);
   fileSystem.saveToFile("valobj3Display.txt", valobj3Display);
-
 }
 
 void CarregaValores()
@@ -439,7 +428,6 @@ void trigger18() //goals okButton
   PiscaStatus();  
   myNex.writeStr("page dashboard");
   atualizaDashboard();
-  //chama função que atualiza dashboard
 }
 
 void trigger19() //goals cancelButton
@@ -475,7 +463,6 @@ void trigger24() //chooseValor cancelButton
 void trigger25() //chooseValor okButton
 {
   saque = myNex.readNumber("chooseValor.saque.val");
-
   PiscaStatus();
   totalPoupado = totalPoupado - (saque * 100);
   myNex.writeStr("page dashboard");
