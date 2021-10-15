@@ -49,6 +49,39 @@ int saque = 0;
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 bool carregarDados = true;
 
+void SalvaValores()
+{
+  fileSystem.saveToFile("/obj1.txt", obj1);
+  fileSystem.saveToFile("/obj2.txt", obj2);
+  fileSystem.saveToFile("/obj3.txt", obj3);
+  fileSystem.saveToFile("/valobj1Display.txt", valobj1Display);
+  fileSystem.saveToFile("/valobj2Display.txt", valobj2Display);
+  fileSystem.saveToFile("/valobj3Display.txt", valobj3Display);
+
+}
+
+void CarregaValores()
+{
+  fileSystem.openFromFile("/obj1.txt", obj1);
+  fileSystem.openFromFile("/obj2.txt", obj2);
+  fileSystem.openFromFile("/obj3.txt", obj3);
+  fileSystem.openFromFile("/valobj1Display.txt", valobj1Display);
+  fileSystem.openFromFile("/valobj2Display.txt", valobj2Display);
+  fileSystem.openFromFile("/valobj3Display.txt", valobj3Display);
+}
+
+void SalvaSaldo()
+{
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado);
+}
+
+void CarregaSaldo()
+{
+  fileSystem.openFromFile("/totalPoupado.txt", totalPoupado);
+}
+
+
+
 void PiscaStatus()
 {
   digitalWrite(LED_BUILTIN, LOW);
@@ -292,6 +325,10 @@ void setup()
 void loop()
 {
   myNex.NextionListen(); //Tentar deixar somente esta função no void loop
+  //criar condição de restaurar caso exista dados salvos em memória..
+  //pode ser mostrado para o usuário uma tela de "Existem dados salvos em memória, deseja restaurar?"
+  
+
   if (moedaInserida)
   {
     if ((long)(micros() - last_micros) >= debouncing_Servo * tyneT)
@@ -391,22 +428,12 @@ void trigger18() //goals okButton
 {
   obj1 = myNex.readStr("goals.objetivo1.txt");
   valobj1Display = myNex.readNumber("goals.objVal1.val");
-  fileSystem.saveToFile("/valobj1Display.txt", valobj1Display);
   obj2 = myNex.readStr("goals.objetivo2.txt");
   valobj2Display = myNex.readNumber("goals.objVal2.val");
-  fileSystem.saveToFile("/valobj2Display.txt", valobj2Display);
   obj3 = myNex.readStr("goals.objetivo3.txt");
   valobj3Display = myNex.readNumber("goals.objVal3.val");
   valTotalDisplay = valobj1Display + valobj2Display + valobj3Display;
-  fileSystem.saveToFile("/valobj3Display.txt", valobj3Display);
-
-  delay(50);
-  fileSystem.saveToFile("/obj1.txt", obj1); //saving data into file
-  delay(50);
-  fileSystem.saveToFile("/obj2.txt", obj2); //saving data into file
-  delay(50);
-  fileSystem.saveToFile("/obj3.txt", obj3); //saving data into file
-  delay(50);
+  SalvaValores();
   PiscaStatus();  
   myNex.writeStr("page dashboard");
   atualizaDashboard();
@@ -458,7 +485,7 @@ void trigger26() //dashboard resgatar1 Button
   digitalWrite(LED_BUILTIN, LOW);
   delay(150);
   totalPoupado = totalPoupado - (valobj1Display * 100);
-  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  SalvaSaldo();
   digitalWrite(LED_BUILTIN, HIGH);  
   myNex.writeStr("page congrats");
   myNex.writeStr("congrats.user.txt", nomeUsuario);
@@ -471,7 +498,7 @@ void trigger27() //dashboard resgatar2 Button
   digitalWrite(LED_BUILTIN, LOW);
   delay(150);
   totalPoupado = totalPoupado - (valobj2Display * 100);
-  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  SalvaSaldo();
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page congrats");  
   myNex.writeStr("congrats.user.txt", nomeUsuario);  
@@ -484,7 +511,7 @@ void trigger28() //dashboard resgatar3 Button
   digitalWrite(LED_BUILTIN, LOW);
   delay(150);
   totalPoupado = totalPoupado - (valobj3Display * 100);
-  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  SalvaSaldo();
   digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page congrats");  
   myNex.writeStr("congrats.user.txt", nomeUsuario);  
@@ -495,7 +522,7 @@ void trigger28() //dashboard resgatar3 Button
 void trigger29() //dashboard resgatarTotal Button
 {  
   totalPoupado = 0;
-  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  SalvaSaldo();  
   obj1 = "";
   obj2 = "";
   obj3 = "";
@@ -507,6 +534,7 @@ void trigger29() //dashboard resgatarTotal Button
   progress2 = 0;
   progress3 = 0;
   progressTotal =0;
+  SalvaValores();
   atualizaDashboard();
   PiscaStatus();  
   myNex.writeStr("congrats.user.txt", nomeUsuario);  
