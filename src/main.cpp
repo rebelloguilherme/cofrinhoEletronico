@@ -51,12 +51,12 @@ bool carregarDados = true;
 
 void SalvaValores()
 {
-  fileSystem.saveToFile("/obj1.txt", obj1);
-  fileSystem.saveToFile("/obj2.txt", obj2);
-  fileSystem.saveToFile("/obj3.txt", obj3);
-  fileSystem.saveToFile("/valobj1Display.txt", valobj1Display);
-  fileSystem.saveToFile("/valobj2Display.txt", valobj2Display);
-  fileSystem.saveToFile("/valobj3Display.txt", valobj3Display);
+  fileSystem.saveToFile("obj1.txt", obj1);
+  fileSystem.saveToFile("obj2.txt", obj2);
+  fileSystem.saveToFile("obj3.txt", obj3);
+  fileSystem.saveToFile("valobj1Display.txt", valobj1Display);
+  fileSystem.saveToFile("valobj2Display.txt", valobj2Display);
+  fileSystem.saveToFile("valobj3Display.txt", valobj3Display);
 
 }
 
@@ -72,7 +72,7 @@ void CarregaValores()
 
 void SalvaSaldo()
 {
-  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado);
+  fileSystem.saveToFile("totalPoupado.txt", totalPoupado);
 }
 
 void CarregaSaldo()
@@ -327,7 +327,9 @@ void loop()
   myNex.NextionListen(); //Tentar deixar somente esta função no void loop
   //criar condição de restaurar caso exista dados salvos em memória..
   //pode ser mostrado para o usuário uma tela de "Existem dados salvos em memória, deseja restaurar?"
-  
+  //chamar funcção de verificar o tamanho da memória do esp 
+  //usando a lib EFFortless_SPIFFS
+  //https://github.com/thebigpotatoe/Effortless-SPIFFS
 
   if (moedaInserida)
   {
