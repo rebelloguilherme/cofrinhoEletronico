@@ -48,7 +48,6 @@ void SalvaValores()
   fileSystem.saveToFile("valobj2Display.txt", valobj2Display);
   fileSystem.saveToFile("valobj3Display.txt", valobj3Display);
 }
-
 void CarregaValores()
 {
   fileSystem.openFromFile("/obj1.txt", obj1);
@@ -58,18 +57,14 @@ void CarregaValores()
   fileSystem.openFromFile("/valobj2Display.txt", valobj2Display);
   fileSystem.openFromFile("/valobj3Display.txt", valobj3Display);
 }
-
 void SalvaSaldo()
 {
   fileSystem.saveToFile("totalPoupado.txt", totalPoupado);
 }
-
 void CarregaSaldo()
 {
   fileSystem.openFromFile("/totalPoupado.txt", totalPoupado);
 }
-
-
 
 void PiscaStatus()
 {
