@@ -39,6 +39,23 @@ uint16_t progress3 = 0;
 uint16_t progressTotal = 0;
 int saque = 0;
 
+
+void ZerarValores()
+{
+  totalPoupado = 0;
+  obj1 = "";
+  obj2 = "";
+  obj3 = "";
+  valobj1Display = 0;
+  valobj2Display = 0;
+  valobj3Display = 0;
+  valTotalDisplay = 0;
+  progress1 = 0;
+  progress2 = 0;
+  progress3 = 0;
+  progressTotal =0;
+}
+
 void SalvaValores()
 {
   fileSystem.saveToFile("obj1.txt", obj1);
@@ -149,37 +166,9 @@ void Insert(int moeda) //atualiza tudo que decorre da inserção da moeda...
   Moeda = moeda;
   servoMoeda.write(0); //Libera a moeda
   totalPoupado = totalPoupado + Moeda;
-  //fileSystem.saveToFile("/totalPoupado.txt", totalPoupado); //saving data into file
+  SalvaSaldo();
   Moeda = 0;
   PiscaStatus();
-  // progress1 = totalPoupado / valobj1Display;
-  // if (progress1 >= 100)
-  // {
-  //   progress1 = 100;
-  //   myNex.writeNum("dashboard.resgatar1.pic", 15);
-  //   myNex.writeNum("dashboard.resgatar1.pic2", 16);
-  // }  
-  // progress2 = totalPoupado / valobj2Display;
-  // if (progress2 >= 100)
-  // {
-  //   progress2 = 100;
-  //   myNex.writeNum("dashboard.resgatar2.pic", 15);
-  //   myNex.writeNum("dashboard.resgatar2.pic2", 16);
-  // }
-  // progress3 = totalPoupado / valobj3Display;
-  // if (progress3 >= 100)
-  // {
-  //   progress3 = 100;
-  //   myNex.writeNum("dashboard.resgatar3.pic", 15);
-  //   myNex.writeNum("dashboard.resgatar3.pic2", 16);
-  // }
-  // progressTotal = totalPoupado / valTotalDisplay;
-  // if (progressTotal >= 100)
-  // {
-  //   progressTotal = 100;
-  //   myNex.writeNum("dashboard.resgatarTotal.pic", 15);
-  //   myNex.writeNum("dashboard.resgatarTotal.pic2", 16);
-  // }
   atualizaDashboard();
   moedaInserida = true;
 }
@@ -210,22 +199,22 @@ void Digitou(String tecla)
     entradaSenha += tecla;
     if (entradaSenha.length() == 1)
     {
-      myNex.writeNum("passEnter.q0.picc", 62); //ascende o 1º led virtual
+      myNex.writeNum("passEnter.q0.picc", 4); //ascende o 1º led virtual
       PiscaStatus();
     }
     if (entradaSenha.length() == 2)
     {
-      myNex.writeNum("passEnter.q1.picc", 62); //ascende o 2º led virtual
+      myNex.writeNum("passEnter.q1.picc", 4); //ascende o 2º led virtual
       PiscaStatus();
     }
     if (entradaSenha.length() == 3)
     {
-      myNex.writeNum("passEnter.q2.picc", 62); //ascende o 3º led virtual
+      myNex.writeNum("passEnter.q2.picc", 4); //ascende o 3º led virtual
       PiscaStatus();
     }
     if (entradaSenha.length() == 4)
     {
-      myNex.writeNum("passEnter.q3.picc", 62); //ascende o 4º led virtual
+      myNex.writeNum("passEnter.q3.picc", 4); //ascende o 4º led virtual
       PiscaStatus();
     }
   }
@@ -328,7 +317,17 @@ void loop()
 
 void trigger0() //introConfig configButton
 {
-  myNex.writeStr("page userData");
+  CarregaSaldo();
+  CarregaValores();
+  if (valTotalDisplay > 0 || totalPoupado > 0)
+  {
+    //vai pra pagina de decisão, se quer carregar os dados da memória ou não..
+    myNex.writeStr("page loadMemory");
+  }
+  else
+  {
+    myNex.writeStr("page userData");
+  }  
 }
 void trigger1()
 { //DIGITOU 1
@@ -428,7 +427,6 @@ void trigger18() //goals okButton
 void trigger19() //goals cancelButton
 {
   PiscaStatus();
-  myNex.writeStr("page animationTest"); //only for test purpouses
 }
 
 void trigger20() //Dashboard backButton
@@ -443,12 +441,17 @@ void trigger21() //Dashboard unlockButton
   myNex.writeStr("page passEnter");
 }
 
-void trigger22() //congrats openButton
+void trigger22() //loadMemory okButton
 {
+  CarregaValores();
+  CarregaSaldo();
+  myNex.writeStr("page dashboard");
 }
 
-void trigger23() //congrats waitButton
+void trigger23() //loadMemory noButton
 {
+  ZerarValores();
+  myNex.writeStr("page userData");
 }
 
 void trigger24() //chooseValor cancelButton
@@ -457,11 +460,6 @@ void trigger24() //chooseValor cancelButton
 
 void trigger25() //chooseValor okButton
 {
-  saque = myNex.readNumber("chooseValor.saque.val");
-  PiscaStatus();
-  totalPoupado = totalPoupado - (saque * 100);
-  myNex.writeStr("page dashboard");
-  atualizaDashboard();
 }
 
 void trigger26() //dashboard resgatar1 Button
@@ -505,19 +503,8 @@ void trigger28() //dashboard resgatar3 Button
 }
 void trigger29() //dashboard resgatarTotal Button
 {  
-  totalPoupado = 0;
+  ZerarValores();
   SalvaSaldo();  
-  obj1 = "";
-  obj2 = "";
-  obj3 = "";
-  valobj1Display = 0;
-  valobj2Display = 0;
-  valobj3Display = 0;
-  valTotalDisplay = 0;
-  progress1 = 0;
-  progress2 = 0;
-  progress3 = 0;
-  progressTotal =0;
   SalvaValores();
   atualizaDashboard();
   PiscaStatus();  
