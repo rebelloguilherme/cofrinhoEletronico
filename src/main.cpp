@@ -58,25 +58,32 @@ void ZerarValores()
 
 void SalvaValores()
 {
-  fileSystem.saveToFile("obj1.txt", obj1);
-  fileSystem.saveToFile("obj2.txt", obj2);
-  fileSystem.saveToFile("obj3.txt", obj3);
-  fileSystem.saveToFile("valobj1Display.txt", valobj1Display);
-  fileSystem.saveToFile("valobj2Display.txt", valobj2Display);
-  fileSystem.saveToFile("valobj3Display.txt", valobj3Display);
+  fileSystem.saveToFile("/user.txt", nomeUsuario);
+  fileSystem.saveToFile("/obj1.txt", obj1);
+  fileSystem.saveToFile("/obj2.txt", obj2);
+  fileSystem.saveToFile("/obj3.txt", obj3);
+  fileSystem.saveToFile("/valobj1Display.txt", valobj1Display);
+  fileSystem.saveToFile("/valobj2Display.txt", valobj2Display);
+  fileSystem.saveToFile("/valobj3Display.txt", valobj3Display);
+  fileSystem.saveToFile("/valTotalDisplay.txt", valTotalDisplay);
+  
 }
 void CarregaValores()
 {
+  fileSystem.openFromFile("/user.txt", nomeUsuario);
   fileSystem.openFromFile("/obj1.txt", obj1);
   fileSystem.openFromFile("/obj2.txt", obj2);
   fileSystem.openFromFile("/obj3.txt", obj3);
   fileSystem.openFromFile("/valobj1Display.txt", valobj1Display);
   fileSystem.openFromFile("/valobj2Display.txt", valobj2Display);
-  fileSystem.openFromFile("/valobj3Display.txt", valobj3Display);
+  fileSystem.openFromFile("/valobj3Display.txt", valobj3Display);  
+  fileSystem.openFromFile("/valTotalDisplay.txt", valTotalDisplay);
+
+
 }
 void SalvaSaldo()
 {
-  fileSystem.saveToFile("totalPoupado.txt", totalPoupado);
+  fileSystem.saveToFile("/totalPoupado.txt", totalPoupado);
 }
 void CarregaSaldo()
 {
@@ -445,6 +452,7 @@ void trigger22() //loadMemory okButton
 {
   CarregaValores();
   CarregaSaldo();
+  atualizaDashboard();
   myNex.writeStr("page dashboard");
 }
 
