@@ -12,6 +12,7 @@ const int MOEDA10 = 13;
 
 eSPIFFS fileSystem; //criando instancia da Classe eSPIFFS
 Servo servoMoeda;
+Servo servoPorta;
 long debouncing_time = 1500; //Debouncing Time in Milliseconds 1000 //Software debouncing in Interrupt, by Delphiño K.M.//1500 era o ultimo valor
 volatile unsigned long last_micros;
 long t = 1000; //time between debounce interruptions
@@ -39,6 +40,15 @@ uint16_t progress3 = 0;
 uint16_t progressTotal = 0;
 int saque = 0;
 
+void abrirPorta()
+{
+  servoPorta.write(0);
+}
+
+void fecharPorta()
+{
+  servoPorta.write(180);
+}
 
 void ZerarValores()
 {
@@ -286,15 +296,19 @@ void setup()
   pinMode(MOEDA10, INPUT);
   pinMode(LED_BUILTIN, OUTPUT); // The built-in LED(GPIO 2) is initialized as an output and will be used to debug some stuff
   digitalWrite(LED_BUILTIN, HIGH);
+  servoPorta.attach(0); //attaching PIN D3(GPIO0) to servoPorta signal Pin
+  delay(200);
+  
+  delay(5000);
+  
 
-  servoMoeda.attach(15); // attaching PIN D8(GPIO15) to servo Signal pin
+
+  servoMoeda.attach(15); // attaching PIN D8(GPIO15) to servoMoeda Signal pin
   delay(200);
   servoMoeda.write(140); //Rampa de moedas travada, valor original 150
   delay(250);
   myNex.writeStr("page 0"); // For synchronizing Nextion page in case of reset to Arduino
-  delay(50);
-  myNex.lastCurrentPageId = 1; // At the first run of the loop, the currentPageId and the lastCurrentPageId
-                               // must have different values, due to run the function firstRefresh()
+  delay(50);  
   attachInterrupt(digitalPinToInterrupt(MOEDA100), debounceInterrupt100, RISING);
   attachInterrupt(digitalPinToInterrupt(MOEDA50), debounceInterrupt50, RISING);
   attachInterrupt(digitalPinToInterrupt(MOEDA25), debounceInterrupt25, RISING);
