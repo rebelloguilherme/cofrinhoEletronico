@@ -439,6 +439,7 @@ void trigger18() //goals okButton
   obj3 = myNex.readStr("goals.objetivo3.txt");
   valobj3Display = myNex.readNumber("goals.objVal3.val");
   valTotalDisplay = valobj1Display + valobj2Display + valobj3Display;
+  delay(100);
   SalvaValores();
   PiscaStatus();  
   myNex.writeStr("page dashboard");
