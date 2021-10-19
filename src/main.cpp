@@ -63,7 +63,7 @@ void ZerarValores()
   progress1 = 0;
   progress2 = 0;
   progress3 = 0;
-  progressTotal =0;
+  progressTotal = 0;
 }
 
 void SalvaValores()
@@ -294,19 +294,15 @@ void setup()
   pinMode(MOEDA25, INPUT);
   pinMode(MOEDA5, INPUT);
   pinMode(MOEDA10, INPUT);
-  pinMode(LED_BUILTIN, OUTPUT); // The built-in LED(GPIO 2) is initialized as an output and will be used to debug some stuff
+  pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
   servoPorta.attach(0); //attaching PIN D3(GPIO0) to servoPorta signal Pin
-  delay(200);
-  
-  delay(5000);
-  
-
-
+  delay(100);
   servoMoeda.attach(15); // attaching PIN D8(GPIO15) to servoMoeda Signal pin
-  delay(200);
+  delay(100);
   servoMoeda.write(140); //Rampa de moedas travada, valor original 150
-  delay(250);
+  delay(150);
+  fecharPorta();
   myNex.writeStr("page 0"); // For synchronizing Nextion page in case of reset to Arduino
   delay(50);  
   attachInterrupt(digitalPinToInterrupt(MOEDA100), debounceInterrupt100, RISING);
@@ -318,13 +314,7 @@ void setup()
 
 void loop()
 {
-  myNex.NextionListen(); //Tentar deixar somente esta função no void loop
-  //criar condição de restaurar caso exista dados salvos em memória..
-  //pode ser mostrado para o usuário uma tela de "Existem dados salvos em memória, deseja restaurar?"
-  //chamar funcção de verificar o tamanho da memória do esp 
-  //usando a lib EFFortless_SPIFFS
-  //https://github.com/thebigpotatoe/Effortless-SPIFFS
-
+  myNex.NextionListen();
   if (moedaInserida)
   {
     if ((long)(micros() - last_micros) >= debouncing_Servo * tyneT)
@@ -392,10 +382,20 @@ void trigger10()
 }
 
 void trigger11() //unlocked lockButton
-{                //Evento ativado no botão Lock, page1
+{                //Evento ativado no botão Lock
   PiscaStatus();
   entradaSenha.remove(0, 4);
-  myNex.writeStr("page intro");
+  if (totalPoupado != 0)
+  {
+    atualizaDashboard();
+    myNex.writeStr("page dashboard");
+    fecharPorta();    
+  }
+  else
+  {
+    myNex.writeStr("page goals");
+    fecharPorta();    
+  }  
 }
 
 void trigger12() //locked tryAgainButton
@@ -486,52 +486,44 @@ void trigger25() //chooseValor okButton
 
 void trigger26() //dashboard resgatar1 Button
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(150);
   totalPoupado = totalPoupado - (valobj1Display * 100);
   SalvaSaldo();
-  digitalWrite(LED_BUILTIN, HIGH);  
   myNex.writeStr("page congrats");
   myNex.writeStr("congrats.user.txt", nomeUsuario);
-  delay(5000);  
-  myNex.writeStr("page dashboard");
-  atualizaDashboard();
+  delay(4500);
+  abrirPorta(); 
+  myNex.writeStr("page unlocked");
 }
 void trigger27() //dashboard resgatar2 Button
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(150);
   totalPoupado = totalPoupado - (valobj2Display * 100);
   SalvaSaldo();
-  digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page congrats");  
-  myNex.writeStr("congrats.user.txt", nomeUsuario);  
-  delay(5000);
-  myNex.writeStr("page dashboard");
-  atualizaDashboard();  
+  myNex.writeStr("congrats.user.txt", nomeUsuario);
+  delay(4500);
+  abrirPorta(); 
+  myNex.writeStr("page unlocked");
 }
 void trigger28() //dashboard resgatar3 Button
 {
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(150);
   totalPoupado = totalPoupado - (valobj3Display * 100);
   SalvaSaldo();
-  digitalWrite(LED_BUILTIN, HIGH);
   myNex.writeStr("page congrats");  
-  myNex.writeStr("congrats.user.txt", nomeUsuario);  
-  delay(5000);
-  myNex.writeStr("page dashboard");
-  atualizaDashboard();  
+  myNex.writeStr("congrats.user.txt", nomeUsuario);
+  delay(4500);
+  abrirPorta(); 
+  myNex.writeStr("page unlocked");
 }
 void trigger29() //dashboard resgatarTotal Button
-{  
+{ 
+  PiscaStatus();
   ZerarValores();
   SalvaSaldo();  
   SalvaValores();
-  atualizaDashboard();
-  PiscaStatus();  
-  myNex.writeStr("congrats.user.txt", nomeUsuario);  
-  myNex.writeStr("page congrats");   
-  delay(5000);
-  myNex.writeStr("page goals");  
+  myNex.writeStr("page congrats");    
+  myNex.writeStr("congrats.user.txt", nomeUsuario);   
+  delay(4500);  
+  abrirPorta();   
+  myNex.writeStr("page unlocked");
+          
 }
