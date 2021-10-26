@@ -200,6 +200,7 @@ void comparaSenha()
   {
     delay(200);
     myNex.writeStr("page unlocked");
+    abrirPorta();
   }
   else
   {
@@ -525,6 +526,5 @@ void trigger29() //dashboard resgatarTotal Button
   myNex.writeStr("congrats.user.txt", nomeUsuario);   
   delay(4500);  
   abrirPorta();   
-  myNex.writeStr("page unlocked");
-          
+  myNex.writeStr("page unlocked");          
 }
